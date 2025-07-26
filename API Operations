@@ -1,7 +1,7 @@
 // JavaScript Example: Reading Entities
 // Filterable fields: budget, use_case, region, preferences, extra_info, build_results
 async function fetchPCBuildEntities() {
-    const response = await fetch(`https://app.base44.com/api/apps/68839b4e5e6b9cb14916da5d/entities/PCBuild`, {
+    const response = await fetch(`https://stackedpcai.tech`, {
         headers: {
             'api_key': '8eGAW89DG3Lu0rJHfuEuHsCA8fQ0Ag', // or use await User.me() to get the API key
             'Content-Type': 'application/json'
@@ -14,7 +14,7 @@ async function fetchPCBuildEntities() {
 // JavaScript Example: Updating an Entity
 // Filterable fields: budget, use_case, region, preferences, extra_info, build_results
 async function updatePCBuildEntity(entityId, updateData) {
-    const response = await fetch(`https://app.base44.com/api/apps/68839b4e5e6b9cb14916da5d/entities/PCBuild/${entityId}`, {
+    const response = await fetch(`https://stackedpcai.tech`, {
         method: 'PUT',
         headers: {
             'api_key': '8eGAW89DG3Lu0rJHfuEuHsCA8fQ0Ag', // or use await User.me() to get the API key
