@@ -1,0 +1,65 @@
+{
+  "name": "PCBuild",
+  "type": "object",
+  "properties": {
+    "budget": {
+      "type": "number",
+      "description": "User's budget in USD"
+    },
+    "use_case": {
+      "type": "string",
+      "enum": [
+        "gaming",
+        "streaming",
+        "video_editing",
+        "general_use",
+        "developer_workstation"
+      ],
+      "description": "Primary intended use for the PC"
+    },
+    "region": {
+      "type": "string",
+      "enum": [
+        "us",
+        "canada",
+        "uk",
+        "india",
+        "australia",
+        "germany"
+      ],
+      "description": "User's region for pricing and availability"
+    },
+    "preferences": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "rgb_lighting",
+          "small_form_factor",
+          "low_noise",
+          "overclocking",
+          "future_proof",
+          "wifi_bluetooth",
+          "white_theme",
+          "max_airflow",
+          "brand_amd",
+          "brand_intel_nvidia"
+        ]
+      },
+      "description": "User preferences for the build"
+    },
+    "extra_info": {
+      "type": "string",
+      "description": "Additional user requirements or comments"
+    },
+    "build_results": {
+      "type": "object",
+      "description": "AI-generated build recommendations"
+    }
+  },
+  "required": [
+    "budget",
+    "use_case",
+    "region"
+  ]
+}
