@@ -1,0 +1,151 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Cpu, 
+  Monitor, 
+  HardDrive, 
+  Zap, 
+  Box, 
+  Fan, 
+  MemoryStick,
+  CircuitBoard,
+  ExternalLink,
+  Star,
+  TrendingUp,
+  Shield
+} from "lucide-react";
+
+const componentIcons = {
+  cpu: Cpu,
+  gpu: Monitor,
+  motherboard: CircuitBoard,
+  ram: MemoryStick,
+  ssd: HardDrive,
+  psu: Zap,
+  case: Box,
+  cooler: Fan
+};
+
+export default function BuildResults({ buildData }) {
+  if (!buildData || !buildData.builds) {
+    console.log("No build data:", buildData);
+    return null;
+  }
+
+  const builds = buildData.builds;
+
+  const getBuildIcon = (type) => {
+    switch(type) {
+      case 'budget': return Shield;
+      case 'balanced': return Star;
+      case 'performance': return TrendingUp;
+      default: return Star;
+    }
+  };
+
+  const getBuildColor = (type) => {
+    switch(type) {
+      case 'budget': return 'from-green-500 to-emerald-500';
+      case 'balanced': return 'from-blue-500 to-cyan-500';
+      case 'performance': return 'from-purple-500 to-pink-500';
+      default: return 'from-blue-500 to-cyan-500';
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-white mb-4">
+          Your PC Build Recommendations
+        </h2>
+        <p className="text-xl text-gray-400">
+          AI-curated builds based on your requirements
+        </p>
+      </div>
+
+      <div className="grid gap-8">
+        {builds.map((build, index) => {
+          const BuildIcon = getBuildIcon(build.type);
+          const colorClass = getBuildColor(build.type);
+          
+          return (
+            <Card key={index} className="bg-gray-900/70 border-gray-800 backdrop-blur-sm">
+              <CardHeader className="text-center pb-6">
+                <div className={`w-20 h-20 bg-gradient-to-br ${colorClass} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                  <BuildIcon className="w-10 h-10 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold text-white capitalize mb-2">
+                  {build.name || `${build.type} Build`}
+                </CardTitle>
+                <div className="text-3xl font-bold text-white mb-2">
+                  ${build.total_cost}
+                </div>
+                <p className="text-gray-400">
+                  {build.description}
+                </p>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <div className="grid gap-4">
+                  {Object.entries(build.components).map(([component, details]) => {
+                    const IconComponent = componentIcons[component] || Box;
+                    const amazonUrl = `https://www.amazon.com/s?k=${encodeURIComponent(details.name)}`;
+                    const neweggUrl = `https://www.newegg.com/p/pl?d=${encodeURIComponent(details.name)}`;
+                    
+                    return (
+                      <div key={component} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3 flex-1">
+                            <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <IconComponent className="w-5 h-5 text-gray-300" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-white capitalize mb-1">
+                                {component.replace('_', ' ')}
+                              </h4>
+                              <p className="text-white font-medium mb-1">
+                                {details.name}
+                              </p>
+                              <p className="text-gray-400 text-sm mb-2">
+                                {details.explanation}
+                              </p>
+                              <Badge variant="outline" className="text-xs">
+                                ${details.price}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2 flex-shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-orange-600 hover:bg-orange-700 border-orange-600 text-white"
+                              onClick={() => window.open(amazonUrl, '_blank')}
+                            >
+                              <ExternalLink className="w-3 h-3 mr-1" />
+                              Amazon
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-white"
+                              onClick={() => window.open(neweggUrl, '_blank')}
+                            >
+                              <ExternalLink className="w-3 h-3 mr-1" />
+                              Newegg
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
