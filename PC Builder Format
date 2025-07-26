@@ -1,0 +1,205 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles, DollarSign, Target, Globe, Settings, MessageSquare } from "lucide-react";
+
+export default function PCBuilderForm({ onSubmit, isLoading }) {
+  const [formData, setFormData] = useState({
+    budget: "",
+    use_case: "",
+    region: "",
+    preferences: [],
+    extra_info: ""
+  });
+
+  const useCases = [
+    { value: "gaming", label: "Gaming" },
+    { value: "streaming", label: "Streaming" },
+    { value: "video_editing", label: "Video Editing" },
+    { value: "general_use", label: "General Use" },
+    { value: "developer_workstation", label: "Developer Workstation" }
+  ];
+
+  const regions = [
+    { value: "us", label: "United States" },
+    { value: "canada", label: "Canada" },
+    { value: "uk", label: "United Kingdom" },
+    { value: "india", label: "India" },
+    { value: "australia", label: "Australia" },
+    { value: "germany", label: "Germany" }
+  ];
+
+  const preferences = [
+    { value: "rgb_lighting", label: "RGB Lighting" },
+    { value: "small_form_factor", label: "Compact Size" },
+    { value: "low_noise", label: "Quiet Operation" },
+    { value: "overclocking", label: "Overclocking Ready" },
+    { value: "future_proof", label: "Future-Proof" },
+    { value: "wifi_bluetooth", label: "Onboard WiFi/Bluetooth" },
+    { value: "white_theme", label: "All-White Theme" },
+    { value: "max_airflow", label: "Maximum Airflow" },
+    { value: "brand_amd", label: "Prefer AMD" },
+    { value: "brand_intel_nvidia", label: "Prefer Intel/Nvidia" }
+  ];
+
+  const handlePreferenceChange = (preference, checked) => {
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        preferences: [...prev.preferences, preference]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        preferences: prev.preferences.filter(p => p !== preference)
+      }));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form data:", formData); // Debug log
+    if (formData.budget && formData.use_case && formData.region) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <Card className="bg-gray-900/50 border-gray-800 backdrop-blur-sm">
+      <CardHeader className="text-center pb-8">
+        <div className="w-16 h-16 bg-gradient-to-br from-white to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Sparkles className="w-8 h-8 text-black" />
+        </div>
+        <CardTitle className="text-3xl font-bold text-white mb-2">
+          Build Your Perfect PC
+        </CardTitle>
+        <p className="text-gray-400 text-lg">
+          AI-powered recommendations tailored to your needs and budget
+        </p>
+      </CardHeader>
+
+      <CardContent className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Budget */}
+          <div className="space-y-3">
+            <Label className="text-white text-base font-medium flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-400" />
+              Budget (USD)
+            </Label>
+            <Input
+              type="number"
+              placeholder="e.g. 1500"
+              value={formData.budget}
+              onChange={(e) => setFormData(prev => ({ ...prev, budget: e.target.value }))}
+              className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 h-12 text-lg"
+              required
+            />
+          </div>
+
+          {/* Use Case */}
+          <div className="space-y-3">
+            <Label className="text-white text-base font-medium flex items-center gap-2">
+              <Target className="w-5 h-5 text-blue-400" />
+              Primary Use Case
+            </Label>
+            <Select value={formData.use_case} onValueChange={(value) => setFormData(prev => ({ ...prev, use_case: value }))}>
+              <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white h-12">
+                <SelectValue placeholder="What will you use this PC for?" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                {useCases.map((useCase) => (
+                  <SelectItem key={useCase.value} value={useCase.value} className="text-white hover:bg-gray-700">
+                    {useCase.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Region */}
+          <div className="space-y-3">
+            <Label className="text-white text-base font-medium flex items-center gap-2">
+              <Globe className="w-5 h-5 text-purple-400" />
+              Region
+            </Label>
+            <Select value={formData.region} onValueChange={(value) => setFormData(prev => ({ ...prev, region: value }))}>
+              <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white h-12">
+                <SelectValue placeholder="Select your region" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                {regions.map((region) => (
+                  <SelectItem key={region.value} value={region.value} className="text-white hover:bg-gray-700">
+                    {region.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Preferences */}
+          <div className="space-y-4">
+            <Label className="text-white text-base font-medium flex items-center gap-2">
+              <Settings className="w-5 h-5 text-orange-400" />
+              Preferences (Optional)
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {preferences.map((pref) => (
+                <div key={pref.value} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-gray-600 transition-colors">
+                  <Checkbox
+                    id={pref.value}
+                    checked={formData.preferences.includes(pref.value)}
+                    onCheckedChange={(checked) => handlePreferenceChange(pref.value, checked)}
+                  />
+                  <label
+                    htmlFor={pref.value}
+                    className="text-white font-medium cursor-pointer flex-1"
+                  >
+                    {pref.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Extra Info */}
+          <div className="space-y-3">
+            <Label className="text-white text-base font-medium flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-teal-400" />
+              Additional Requirements (Optional)
+            </Label>
+            <Textarea
+              placeholder="Any special requests or requirements..."
+              value={formData.extra_info}
+              onChange={(e) => setFormData(prev => ({ ...prev, extra_info: e.target.value }))}
+              className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 min-h-[80px]"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isLoading || !formData.budget || !formData.use_case || !formData.region}
+            className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-white to-gray-200 hover:from-gray-100 hover:to-gray-300 text-black transition-all duration-300"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-gray-600 border-t-black rounded-full animate-spin" />
+                Generating Your Build...
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5" />
+                Generate My PC Build
+              </div>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
