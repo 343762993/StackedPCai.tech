@@ -1,0 +1,155 @@
+import React, { useState } from "react";
+import { PCBuild } from "@/entities/PCBuild";
+import { InvokeLLM } from "@/integrations/Core";
+import PCBuilderForm from "../components/PCBuilderForm";
+import BuildResults from "../components/BuildResults";
+
+export default function Home() {
+  const [buildResults, setBuildResults] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleBuildSubmit = async (formData) => {
+    console.log("Received form data:", formData);
+    setIsLoading(true);
+    setBuildResults(null);
+    setError(null);
+
+    try {
+      const prompt = `
+        You are a PC building expert. Create 3 PC builds for a user with these requirements:
+        - Budget: $${formData.budget}
+        - Use Case: ${formData.use_case}
+        - Region: ${formData.region}
+        - Preferences: ${formData.preferences.join(', ') || 'None'}
+        - Extra Info: ${formData.extra_info || 'None'}
+        
+        Provide Budget, Balanced, and Performance builds with realistic components and pricing.
+        Each build needs: CPU, GPU, Motherboard, RAM, SSD, PSU, Case, Cooler.
+        Include component names, prices, and brief explanations.
+      `;
+
+      const response = await InvokeLLM({
+        prompt,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            builds: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  type: { type: "string" },
+                  name: { type: "string" },
+                  description: { type: "string" },
+                  total_cost: { type: "number" },
+                  components: {
+                    type: "object",
+                    properties: {
+                      cpu: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      gpu: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      motherboard: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      ram: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      ssd: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      psu: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      case: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      },
+                      cooler: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          price: { type: "number" },
+                          explanation: { type: "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      console.log("AI Response:", response);
+
+      // Save to database
+      await PCBuild.create({
+        ...formData,
+        build_results: response
+      });
+
+      setBuildResults(response);
+    } catch (error) {
+      console.error("Error generating PC build:", error);
+      setError("Failed to generate PC build. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <PCBuilderForm onSubmit={handleBuildSubmit} isLoading={isLoading} />
+      
+      {error && (
+        <div className="bg-red-900/50 border border-red-800 rounded-lg p-4 text-center">
+          <p className="text-red-200">{error}</p>
+        </div>
+      )}
+      
+      {buildResults && (
+        <BuildResults buildData={buildResults} />
+      )}
+    </div>
+  );
+}
